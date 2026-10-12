@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GALA REPUESTOS | Repuestos para motocicletas</title>
+  <style>
+    :root {
+      --petroleo: rgb(31, 58, 77);
+      --acero: rgb(233, 237, 240);
+      --amarillo: rgb(242, 169, 0);
+      --rojo: rgb(200, 60, 40);
+      --gris: rgb(90, 104, 115);
+      --blanco: rgb(255, 255, 255);
+      --texto: rgb(34, 44, 52);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: "Segoe UI", Roboto, Arial, sans-serif; background: var(--acero); color: var(--texto); line-height: 1.65; }
+    h1, h2, h3, h4, .marca { font-family: "Arial Narrow", "Roboto Condensed", Impact, sans-serif; letter-spacing: .02em; }
+    a:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 3px; }
+
+    header { background: var(--petroleo); color: var(--blanco); }
+    .barra { max-width: 1000px; margin: 0 auto; padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.15); }
+    .marca { font-size: 1.5rem; font-weight: 700; }
+    .marca span { color: var(--amarillo); }
+    .barra ul { list-style: none; display: flex; flex-wrap: wrap; gap: 18px; }
+    .barra a { color: var(--blanco); text-decoration: none; font-size: .95rem; }
+    .barra a:hover { color: var(--amarillo); }
+    .hero { max-width: 1000px; margin: 0 auto; padding: 48px 20px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; margin-bottom: 14px; }
+    .hero p { color: rgb(205, 216, 224); max-width: 46ch; margin-bottom: 20px; }
+    .hero img { width: 100%; height: auto; border-radius: 12px; }
+    .boton { display: inline-block; padding: 10px 20px; background: var(--amarillo); color: var(--petroleo); font-weight: 700; text-decoration: none; border-radius: 4px; }
+    .boton:hover { background: var(--blanco); }
+
+    main { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+    .bloque { background: var(--blanco); padding: 28px 32px; margin-bottom: 40px; border-radius: 6px; scroll-margin-top: 16px; }
+    .bloque > h2 { font-size: 1.8rem; color: var(--petroleo); margin-bottom: 4px; padding-bottom: 8px; border-bottom: 4px solid var(--amarillo); display: inline-block; }
+    .bloque > .sub { color: var(--gris); margin: 10px 0 18px; }
+    .titulo-seccion { font-size: 1.8rem; color: var(--petroleo); margin: 8px 0 20px; }
+
+    #indice { border-left: 8px solid var(--amarillo); border-radius: 0; }
+    #indice ol { padding-left: 1.4em; columns: 2; column-gap: 40px; }
+    #indice li { margin-bottom: 8px; font-weight: 600; padding-left: 4px; }
+    #indice li::marker { color: var(--amarillo); font-weight: 800; }
+    #indice a { color: var(--petroleo); text-decoration: none; border-bottom: 2px solid transparent; }
+    #indice a:hover { border-bottom-color: var(--amarillo); }
+
+    /* Marcas desplegables */
+    .marcas { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; align-items: start; }
+    details { border: 1px solid rgb(205, 213, 219); border-radius: 6px; background: var(--acero); }
+    summary { cursor: pointer; padding: 10px 14px; font-weight: 700; color: var(--petroleo); }
+    details[open] { background: var(--blanco); border-color: var(--amarillo); }
+    details[open] summary { background: var(--amarillo); border-radius: 5px 5px 0 0; }
+    details ul { padding: 10px 14px 12px 32px; font-size: .92rem; }
+    details small { color: var(--gris); }
+
+    /* Buscador */
+    .buscador { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    label { display: block; font-weight: 700; color: var(--petroleo); margin-bottom: 4px; }
+    select { width: 100%; padding: 10px 12px; font-size: 1rem; border: 2px solid rgb(185, 195, 203); border-radius: 6px; background: var(--blanco); color: var(--texto); }
+    select:disabled { background: var(--acero); color: var(--gris); }
+    #resultado { grid-column: 1 / -1; background: var(--acero); border-left: 6px solid var(--petroleo); padding: 14px 18px; border-radius: 4px; }
+    #resultado.ok { background: rgb(253, 246, 226); border-left-color: var(--amarillo); }
+
+    /* Tabla */
+    .scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 560px; }
+    caption { text-align: left; color: var(--gris); font-size: .9rem; padding-bottom: 8px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgb(215, 222, 227); }
+    th { background: var(--petroleo); color: var(--blanco); }
+    tbody tr:hover td { background: rgb(250, 244, 226); }
+    td.resaltado, th.resaltado { background: var(--amarillo); color: var(--petroleo); font-weight: 700; }
+
+    /* Promos */
+    .promos { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+    .promo { border: 2px dashed var(--rojo); border-radius: 8px; padding: 18px; background: rgb(255, 250, 247); }
+    .promo h4 { font-size: 1.8rem; color: var(--rojo); line-height: 1.1; }
+    .promo .que { font-weight: 700; color: var(--petroleo); margin-bottom: 6px; }
+    .promo .tag { display: inline-block; background: var(--rojo); color: var(--blanco); font-size: .8rem; padding: 2px 10px; border-radius: 20px; margin-bottom: 8px; }
+    .promo p { font-size: .93rem; }
+
+    /* Tutorial */
+    .tema { background: var(--blanco); display: grid; grid-template-columns: 1fr 1.3fr; margin-bottom: 28px; overflow: hidden; border-radius: 6px; scroll-margin-top: 16px; }
+    .tema h3 { grid-column: 1 / -1; background: var(--petroleo); color: var(--blanco); font-size: 1.5rem; padding: 14px 24px; border-bottom: 4px solid var(--amarillo); }
+    .tema img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .texto { padding: 24px; }
+    .texto h4 { color: var(--petroleo); font-size: 1.15rem; margin: 18px 0 6px; }
+    .texto ul { padding-left: 1.2em; }
+    .texto li { margin-bottom: 4px; }
+    .volver { display: inline-block; margin-top: 16px; padding: 8px 16px; background: var(--amarillo); color: var(--petroleo); text-decoration: none; font-weight: 700; border-radius: 4px; font-size: .9rem; }
+    .volver:hover { background: var(--petroleo); color: var(--amarillo); }
+
+    footer { background: var(--petroleo); color: rgb(205, 216, 224); text-align: center; padding: 28px 20px; }
+    footer strong { color: var(--amarillo); }
+
+    @media (max-width: 720px) {
+      .hero, .tema, .buscador { grid-template-columns: 1fr; }
+      #indice ol { columns: 1; }
+      .tema img { height: auto; }
+      .bloque { padding: 22px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="barra">
+      <div class="marca">GALA <span>REPUESTOS</span></div>
+      <nav aria-label="Menú principal">
+        <ul>
+          <li><a href="#marcas">Marcas</a></li>
+          <li><a href="#buscador">Buscar mi moto</a></li>
+          <li><a href="#precios">Precios</a></li>
+          <li><a href="#promociones">Promociones</a></li>
+          <li><a href="#indice">Tutorial</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="hero">
+      <div>
+        <h1>Repuestos para tu moto, al mejor precio</h1>
+        <p>Encuentra repuestos para las marcas de motos más vendidas en Colombia, consulta nuestra lista de precios y aprovecha las promociones del mes.</p>
+        <a class="boton" href="#buscador">Buscar repuestos para mi moto</a>
+      </div>
+      <img src="imagen1.jpg" alt="Ilustración de una motocicleta" width="400" height="240">
+    </div>
+  </header>
+
+  <main>
+
+    <section id="marcas" class="bloque">
+      <h2>Marcas de motos en Colombia</h2>
+      <p class="sub">Haz clic en una marca para ver los modelos para los que tenemos repuestos.</p>
+      <div class="marcas">
+          <details><summary>AKT</summary><ul><li>AKT NKD 125 <small>(125 cc)</small></li><li>AKT TT 125 <small>(125 cc)</small></li><li>AKT Dynamic Pro 125 <small>(125 cc)</small></li><li>AKT CR4 200 <small>(200 cc)</small></li></ul></details>
+          <details><summary>Bajaj</summary><ul><li>Bajaj Boxer CT 100 <small>(100 cc)</small></li><li>Bajaj Discover 125 <small>(125 cc)</small></li><li>Bajaj Pulsar NS 160 <small>(160 cc)</small></li><li>Bajaj Pulsar N250 <small>(250 cc)</small></li><li>Bajaj Dominar 400 <small>(400 cc)</small></li></ul></details>
+          <details><summary>Yamaha</summary><ul><li>Yamaha YBR 125 <small>(125 cc)</small></li><li>Yamaha XTZ 125 <small>(125 cc)</small></li><li>Yamaha FZ 150 <small>(150 cc)</small></li><li>Yamaha MT-03 <small>(321 cc)</small></li></ul></details>
+          <details><summary>Honda</summary><ul><li>Honda CB 125F <small>(125 cc)</small></li><li>Honda XR 150L <small>(150 cc)</small></li><li>Honda CB 160F <small>(160 cc)</small></li><li>Honda CB 190R <small>(190 cc)</small></li></ul></details>
+          <details><summary>Suzuki</summary><ul><li>Suzuki AX4 110 <small>(110 cc)</small></li><li>Suzuki GN 125 <small>(125 cc)</small></li><li>Suzuki Gixxer 150 <small>(150 cc)</small></li><li>Suzuki DR 650 <small>(650 cc)</small></li></ul></details>
+          <details><summary>Hero</summary><ul><li>Hero Eco Deluxe <small>(100 cc)</small></li><li>Hero Ignitor 125 <small>(125 cc)</small></li><li>Hero Hunk 160R <small>(160 cc)</small></li></ul></details>
+          <details><summary>TVS</summary><ul><li>TVS Sport 100 <small>(100 cc)</small></li><li>TVS Raider 125 <small>(125 cc)</small></li><li>TVS Apache RTR 160 <small>(160 cc)</small></li><li>TVS Apache RTR 200 <small>(200 cc)</small></li></ul></details>
+          <details><summary>Kawasaki</summary><ul><li>Kawasaki KLX 140 <small>(140 cc)</small></li><li>Kawasaki Ninja 400 <small>(400 cc)</small></li><li>Kawasaki Z400 <small>(400 cc)</small></li></ul></details>
+          <details><summary>KTM</summary><ul><li>KTM Duke 200 <small>(200 cc)</small></li><li>KTM Duke 390 <small>(390 cc)</small></li><li>KTM Adventure 390 <small>(390 cc)</small></li></ul></details>
+          <details><summary>Kymco</summary><ul><li>Kymco Agility 125 <small>(125 cc)</small></li><li>Kymco Like 150 <small>(150 cc)</small></li><li>Kymco AK 550 <small>(550 cc)</small></li></ul></details>
+          <details><summary>Royal Enfield</summary><ul><li>Royal Enfield Hunter 350 <small>(350 cc)</small></li><li>Royal Enfield Classic 350 <small>(350 cc)</small></li></ul></details>
+      </div>
+    </section>
+
+    <section id="buscador" class="bloque">
+      <h2>Busca los repuestos de tu moto</h2>
+      <p class="sub">Elige la marca y el modelo para ver los precios que le corresponden.</p>
+      <div class="buscador">
+        <div>
+          <label for="marca">1. Marca</label>
+          <select id="marca">
+            <option value="">Selecciona una marca</option>
+            <option value='AKT'>AKT</option><option value='Bajaj'>Bajaj</option><option value='Yamaha'>Yamaha</option><option value='Honda'>Honda</option><option value='Suzuki'>Suzuki</option><option value='Hero'>Hero</option><option value='TVS'>TVS</option><option value='Kawasaki'>Kawasaki</option><option value='KTM'>KTM</option><option value='Kymco'>Kymco</option><option value='Royal Enfield'>Royal Enfield</option>
+          </select>
+        </div>
+        <div>
+          <label for="modelo">2. Modelo</label>
+          <select id="modelo" disabled>
+            <option value="">Primero elige la marca</option>
+          </select>
+        </div>
+        <div id="resultado" aria-live="polite">Aún no has elegido una moto.</div>
+      </div>
+    </section>
+
+    <section id="precios" class="bloque">
+      <h2>Lista de precios de repuestos</h2>
+      <p class="sub">El precio depende del cilindraje de la moto. Al elegir tu modelo arriba, se resalta tu columna.</p>
+      <div class="scroll">
+        <table id="tabla">
+          <caption>Precios de referencia en pesos colombianos (COP), IVA incluido.</caption>
+          <thead>
+            <tr><th>Repuesto</th><th class="c0">Hasta 125 cc</th><th class="c1">150 a 200 cc</th><th class="c2">250 cc o más</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kit de arrastre (cadena, piñón y corona)</td><td class='c0'>$85.000</td><td class='c1'>$105.000</td><td class='c2'>$190.000</td></tr>
+            <tr><td>Pastillas de freno delanteras</td><td class='c0'>$22.000</td><td class='c1'>$30.000</td><td class='c2'>$55.000</td></tr>
+            <tr><td>Pastillas de freno traseras</td><td class='c0'>$20.000</td><td class='c1'>$28.000</td><td class='c2'>$48.000</td></tr>
+            <tr><td>Aceite 20W-50, 1 litro</td><td class='c0'>$32.000</td><td class='c1'>$38.000</td><td class='c2'>$52.000</td></tr>
+            <tr><td>Filtro de aceite</td><td class='c0'>$14.000</td><td class='c1'>$18.000</td><td class='c2'>$28.000</td></tr>
+            <tr><td>Bujía</td><td class='c0'>$12.000</td><td class='c1'>$16.000</td><td class='c2'>$34.000</td></tr>
+            <tr><td>Batería 12V</td><td class='c0'>$115.000</td><td class='c1'>$140.000</td><td class='c2'>$230.000</td></tr>
+            <tr><td>Llanta trasera</td><td class='c0'>$135.000</td><td class='c1'>$185.000</td><td class='c2'>$320.000</td></tr>
+            <tr><td>Par de amortiguadores traseros</td><td class='c0'>$160.000</td><td class='c1'>$210.000</td><td class='c2'>$420.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="promociones" class="bloque">
+      <h2>Promociones del mes</h2>
+      <p class="sub">Ofertas por tiempo limitado hasta agotar existencias.</p>
+      <div class="promos">
+        <article class="promo">
+          <span class="tag">Combo</span>
+          <h4>20% de descuento</h4>
+          <p class="que">Kit de arrastre</p>
+          <p>Al comprar el kit completo de cadena, piñón y corona. Válido todo el mes.</p>
+        </article>
+        <article class="promo">
+          <span class="tag">Seguridad</span>
+          <h4>2 x 1</h4>
+          <p class="que">Pastillas de freno</p>
+          <p>Lleva las delanteras y las traseras al precio de un solo juego.</p>
+        </article>
+        <article class="promo">
+          <span class="tag">Mantenimiento</span>
+          <h4>15% de descuento</h4>
+          <p class="que">Cambio de aceite</p>
+          <p>Aceite 20W-50 más filtro. Incluye la mano de obra del cambio.</p>
+        </article>
+        <article class="promo">
+          <span class="tag">Envíos</span>
+          <h4>Envío gratis</h4>
+          <p class="que">Compras desde $150.000</p>
+          <p>En compras desde $150.000 el envío es gratis en toda Colombia.</p>
+        </article>
+      </div>
+    </section>
+
+    <h2 class="titulo-seccion">Tutorial: cuida tu moto con los repuestos correctos</h2>
+
+    <nav id="indice" class="bloque" aria-label="Índice del tutorial">
+      <p class="sub">Haz clic en un tema para ir directo a su explicación.</p>
+      <ol>
+          <li><a href="#arrastre">Kit de arrastre: cadena, piñón y corona</a></li>
+          <li><a href="#frenos">Frenos: pastillas y discos</a></li>
+          <li><a href="#aceite">Aceite y filtro</a></li>
+          <li><a href="#bateria">Batería</a></li>
+          <li><a href="#bujia">Bujía</a></li>
+          <li><a href="#llantas">Llantas</a></li>
+      </ol>
+    </nav>
+
+      <article id="arrastre" class="tema">
+        <h3>Kit de arrastre: cadena, piñón y corona</h3>
+        <img src="imagen2.jpg" alt="Kit de arrastre de moto" width="100" height="100">
+        <div class="texto">
+          <p>El kit de arrastre transmite la fuerza del motor a la llanta trasera. Una cadena seca, floja o con eslabones duros desgasta el piñón y la corona. Por eso se cambian las tres piezas juntas.</p>
+          <h4>Tips de GALA REPUESTOS</h4>
+          <ul>
+            <li>Lubrica la cadena cada 500 km.</li>
+            <li>La cadena debe tener entre 2 y 3 cm de holgura.</li>
+            <li>Cambia el kit completo, no solo la cadena.</li>
+          </ul>
+          <a class="volver" href="#indice">Volver al índice</a>
+        </div>
+      </article>
+
+      <article id="frenos" class="tema">
+        <h3>Frenos: pastillas y discos</h3>
+        <img src="imagen3.jpg" alt="Disco y pastillas de freno de moto" width="400" height="240">
+        <div class="texto">
+          <p>Las pastillas presionan el disco para detener la moto. Con el uso se desgastan y, si llegan al metal, rayan el disco. Revisarlas con frecuencia es clave porque en moto el freno es tu principal seguridad.</p>
+          <h4>Tips de GALA REPUESTOS</h4>
+          <ul>
+            <li>Si el freno chilla, revisa las pastillas.</li>
+            <li>Cambia las pastillas cuando tengan menos de 2 mm.</li>
+            <li>Revisa el nivel del líquido de frenos cada mes.</li>
+          </ul>
+          <a class="volver" href="#indice">Volver al índice</a>
+        </div>
+      </article>
+
+      <article id="aceite" class="tema">
+        <h3>Aceite y filtro</h3>
+        <img src="imagen4.jpg" alt="Envase de aceite para motocicleta" width="400" height="240">
+        <div class="texto">
+          <p>El aceite lubrica y enfría el motor, y en muchas motos también lubrica el embrague. Para motos de 4 tiempos se usan aceites como 20W-50 o 10W-40. Cambiarlo a tiempo prolonga la vida del motor.</p>
+          <h4>Tips de GALA REPUESTOS</h4>
+          <ul>
+            <li>Cambia el aceite cada 3.000 a 5.000 km.</li>
+            <li>Usa aceite específico para motos (norma JASO MA).</li>
+            <li>Cambia el filtro cada dos cambios de aceite.</li>
+          </ul>
+          <a class="volver" href="#indice">Volver al índice</a>
+        </div>
+      </article>
+
+      <article id="bateria" class="tema">
+        <h3>Batería</h3>
+        <img src="imagen5.jpg" alt="Batería de moto" width="400" height="240">
+        <div class="texto">
+          <p>La batería arranca el motor y alimenta luces, pito y tablero. En motos dura entre 1 y 3 años. Si la moto se queda varios días sin usar, la batería se descarga más rápido.</p>
+          <h4>Tips de GALA REPUESTOS</h4>
+          <ul>
+            <li>Si el arranque eléctrico se oye lento, revisa la carga.</li>
+            <li>Limpia los bornes con un cepillo.</li>
+            <li>Elige una batería con el mismo voltaje y amperaje.</li>
+          </ul>
+          <a class="volver" href="#indice">Volver al índice</a>
+        </div>
+      </article>
+
+      <article id="bujia" class="tema">
+        <h3>Bujía</h3>
+        <img src="imagen6.jpg" alt="Bujía de moto" width="400" height="240">
+        <div class="texto">
+          <p>La bujía hace la chispa que enciende la mezcla de aire y gasolina. Si está sucia o gastada, la moto se apaga, vibra o gasta más combustible. Es una pieza barata que mejora mucho el rendimiento.</p>
+          <h4>Tips de GALA REPUESTOS</h4>
+          <ul>
+            <li>Cámbiala entre 8.000 y 12.000 km.</li>
+            <li>Usa la referencia que indica el manual de tu moto.</li>
+            <li>Una bujía negra o aceitosa avisa de otros problemas.</li>
+          </ul>
+          <a class="volver" href="#indice">Volver al índice</a>
+        </div>
+      </article>
+
+      <article id="llantas" class="tema">
+        <h3>Llantas</h3>
+        <img src="imagen7.jpg" alt="Llanta de motocicleta" width="400" height="240">
+        <div class="texto">
+          <p>Las llantas son el único contacto de la moto con el piso. El dibujo gastado, grietas o presión incorrecta aumentan el riesgo de derrapar, sobre todo con lluvia.</p>
+          <h4>Tips de GALA REPUESTOS</h4>
+          <ul>
+            <li>Revisa la presión cada semana.</li>
+            <li>Cambia la llanta si el dibujo está liso.</li>
+            <li>Cambia las llantas con más de 5 años aunque se vean bien.</li>
+          </ul>
+          <a class="volver" href="#indice">Volver al índice</a>
+        </div>
+      </article>
+
+  </main>
+
+  <footer>
+    <p><strong>GALA REPUESTOS</strong> · Estamos Ubicados</p>
+    <p>Calle 5 5 89 belacazar · 3135845588</p>
+  </footer>
+
+  <script>
+    const DATA = {"brands": {"AKT": [{"n": "AKT NKD 125", "cc": 125, "s": 0}, {"n": "AKT TT 125", "cc": 125, "s": 0}, {"n": "AKT Dynamic Pro 125", "cc": 125, "s": 0}, {"n": "AKT CR4 200", "cc": 200, "s": 1}], "Bajaj": [{"n": "Bajaj Boxer CT 100", "cc": 100, "s": 0}, {"n": "Bajaj Discover 125", "cc": 125, "s": 0}, {"n": "Bajaj Pulsar NS 160", "cc": 160, "s": 1}, {"n": "Bajaj Pulsar N250", "cc": 250, "s": 2}, {"n": "Bajaj Dominar 400", "cc": 400, "s": 2}], "Yamaha": [{"n": "Yamaha YBR 125", "cc": 125, "s": 0}, {"n": "Yamaha XTZ 125", "cc": 125, "s": 0}, {"n": "Yamaha FZ 150", "cc": 150, "s": 1}, {"n": "Yamaha MT-03", "cc": 321, "s": 2}], "Honda": [{"n": "Honda CB 125F", "cc": 125, "s": 0}, {"n": "Honda XR 150L", "cc": 150, "s": 1}, {"n": "Honda CB 160F", "cc": 160, "s": 1}, {"n": "Honda CB 190R", "cc": 190, "s": 1}], "Suzuki": [{"n": "Suzuki AX4 110", "cc": 110, "s": 0}, {"n": "Suzuki GN 125", "cc": 125, "s": 0}, {"n": "Suzuki Gixxer 150", "cc": 150, "s": 1}, {"n": "Suzuki DR 650", "cc": 650, "s": 2}], "Hero": [{"n": "Hero Eco Deluxe", "cc": 100, "s": 0}, {"n": "Hero Ignitor 125", "cc": 125, "s": 0}, {"n": "Hero Hunk 160R", "cc": 160, "s": 1}], "TVS": [{"n": "TVS Sport 100", "cc": 100, "s": 0}, {"n": "TVS Raider 125", "cc": 125, "s": 0}, {"n": "TVS Apache RTR 160", "cc": 160, "s": 1}, {"n": "TVS Apache RTR 200", "cc": 200, "s": 1}], "Kawasaki": [{"n": "Kawasaki KLX 140", "cc": 140, "s": 1}, {"n": "Kawasaki Ninja 400", "cc": 400, "s": 2}, {"n": "Kawasaki Z400", "cc": 400, "s": 2}], "KTM": [{"n": "KTM Duke 200", "cc": 200, "s": 1}, {"n": "KTM Duke 390", "cc": 390, "s": 2}, {"n": "KTM Adventure 390", "cc": 390, "s": 2}], "Kymco": [{"n": "Kymco Agility 125", "cc": 125, "s": 0}, {"n": "Kymco Like 150", "cc": 150, "s": 1}, {"n": "Kymco AK 550", "cc": 550, "s": 2}], "Royal Enfield": [{"n": "Royal Enfield Hunter 350", "cc": 350, "s": 2}, {"n": "Royal Enfield Classic 350", "cc": 350, "s": 2}]}, "seg": ["Hasta 125 cc", "150 a 200 cc", "250 cc o más"], "prices": [["Kit de arrastre (cadena, piñón y corona)", [85000, 105000, 190000]], ["Pastillas de freno delanteras", [22000, 30000, 55000]], ["Pastillas de freno traseras", [20000, 28000, 48000]], ["Aceite 20W-50, 1 litro", [32000, 38000, 52000]], ["Filtro de aceite", [14000, 18000, 28000]], ["Bujía", [12000, 16000, 34000]], ["Batería 12V", [115000, 140000, 230000]], ["Llanta trasera", [135000, 185000, 320000]], ["Par de amortiguadores traseros", [160000, 210000, 420000]]]};
+    const fmt = n => "$" + n.toLocaleString("es-CO");
+    const marca = document.getElementById("marca");
+    const modelo = document.getElementById("modelo");
+    const resultado = document.getElementById("resultado");
+
+    function resaltar(seg) {
+      document.querySelectorAll("#tabla .resaltado").forEach(e => e.classList.remove("resaltado"));
+      if (seg === null) return;
+      document.querySelectorAll("#tabla .c" + seg).forEach(e => e.classList.add("resaltado"));
+    }
+
+    marca.addEventListener("change", () => {
+      modelo.innerHTML = "";
+      resaltar(null);
+      resultado.className = "";
+      resultado.textContent = "Aún no has elegido una moto.";
+      if (!marca.value) {
+        modelo.disabled = true;
+        modelo.innerHTML = "<option value=''>Primero elige la marca</option>";
+        return;
+      }
+      modelo.disabled = false;
+      modelo.add(new Option("Selecciona un modelo", ""));
+      DATA.brands[marca.value].forEach((m, i) => modelo.add(new Option(m.n + " (" + m.cc + " cc)", i)));
+    });
+
+    modelo.addEventListener("change", () => {
+      if (modelo.value === "") { resaltar(null); return; }
+      const m = DATA.brands[marca.value][modelo.value];
+      resaltar(m.s);
+      const items = DATA.prices.slice(0, 4).map(p => "<li>" + p[0] + ": <strong>" + fmt(p[1][m.s]) + "</strong></li>").join("");
+      resultado.className = "ok";
+      resultado.innerHTML = "<strong>" + m.n + "</strong> · categoría " + DATA.seg[m.s] +
+        "<ul style='margin:8px 0 8px 20px'>" + items + "</ul>" +
+        "<a href='#precios'>Ver la lista completa de precios</a>";
+    });
+  </script>
+</body>
+</html>
